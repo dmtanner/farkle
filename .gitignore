@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Cloud 9
+.~c9_invoke_*.py
+
 # C extensions
 *.so
 
