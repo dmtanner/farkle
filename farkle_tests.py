@@ -5,12 +5,15 @@ class TestFarkle(unittest.TestCase):
   def setUp(self):
     self.farkle = farkle.FarkleGame()
     
-  def test_roll_is_valid(self):
-    dice = self.farkle.roll_dice()
+  def test_roll(self):
+    dice = self.farkle.roll_dice(6)
     self.assertEqual(len(dice), 6)
     for die in dice:
       self.assertGreaterEqual(die, 1)
       self.assertLessEqual(die, 6)
+      
+    dice = self.farkle.roll_dice(3)
+    self.assertEqual(len(dice), 3)
       
   def test_player_score(self):
     self.farkle.add_to_score(0, 300)
@@ -117,6 +120,39 @@ class TestFarkle(unittest.TestCase):
     self.assertTrue((1,) in combinations.keys())
     self.assertTrue((5,) in combinations.keys())
   
+  def test_points_calculation(self):
+    dice = (1,2,3,4,5,6)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 3000)
+    
+    dice = (1,1,3,3,4,4)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 1500)
+    
+    dice = (6,6,6,1,1,1)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 1600)
+    
+    dice = (1,5)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 150)
+  
+    dice = (1,1,1,1,5)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 1150)
+    
+    dice = (5,5,5,1)
+    points = self.farkle.calculate_dice_points(dice)
+    self.assertEqual(points, 600)
+    
+    dice = (1,1,1,2)
+    with self.assertRaises(farkle.InvalidSelectionError):
+      self.farkle.calculate_dice_points(dice)
+      
+    dice = ()
+    with self.assertRaises(farkle.InvalidSelectionError):
+      self.farkle.calculate_dice_points(dice)
+    
   def test_dice_removal(self):
     dice = (1,1,1,3,4,4)
     combinations = self.farkle.get_dice_combinations(dice)
