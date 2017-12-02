@@ -6,7 +6,7 @@ class FarkleGame():
   def __init__(self):
     self.players = {}
     self.players[0] = HumanPlayer(0)
-    self.players[1] = HumanPlayer(1)
+    self.players[1] = ComputerPlayer(1)
     self.current_player_turn = 0
     self.WINNING_SCORE = 10000
     # self.players.append(ComputerPlayer(1))
@@ -184,6 +184,21 @@ class HumanPlayer(Player):
   def select_dice(self, dice):
     return input()
     
+  def roll_again(self, current_round_points, num_remaining_dice):
+    choice = input()
+    if(choice.lower() == 'y'):
+      return True
+    else:
+      return False
+
+
+class ComputerPlayer(Player):
+  def select_dice(self, dice):
+    num_dice_to_select = random.randint(1, len(dice))
+    return random.sample(dice, num_dice_to_select)
+    
+  def roll_again(self, current_round_points, num_remaining_dice):
+    return random.choice([True, False])
 
 class InvalidInputError(Exception):
   pass

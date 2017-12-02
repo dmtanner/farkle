@@ -50,8 +50,9 @@ class FarkleRunner():
           num_remaining_dice = self.MAX_DICE
         print('Number of dice remaining: ' + str(num_remaining_dice))
         print('Roll again? (y/n)')
-        roll_again = input()
-        if(roll_again.lower() == 'y'):
+        roll_again = self.farkle.get_current_player() \
+          .roll_again(self.current_round_points, num_remaining_dice)
+        if(roll_again):
           # turn_over = False
           return self.run_dice_selection(num_remaining_dice)
         else:
