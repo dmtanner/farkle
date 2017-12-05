@@ -4,12 +4,12 @@ from collections import Counter
       
 class FarkleGame():
   def __init__(self):
-    self.players = {}
-    self.players[0] = HumanPlayer(0)
-    self.players[1] = ComputerPlayer(1)
+    self.players = []
     self.current_player_turn = 0
     self.WINNING_SCORE = 10000
-    # self.players.append(ComputerPlayer(1))
+    
+  def add_player(self, player):
+    self.players.append(player)
     
   def get_current_player(self):
     return self.players[self.current_player_turn]
@@ -44,12 +44,12 @@ class FarkleGame():
     return len(self.get_dice_combinations(dice)) == 0
     
   def has_winner(self):
-    for id, player in self.players.items():
+    for player in self.players:
       if(player.score >= self.WINNING_SCORE):
         return True
         
   def get_winner(self):
-    for id, player in self.players.items():
+    for player in self.players:
       if(player.score >= self.WINNING_SCORE):
         return player
     
@@ -124,6 +124,7 @@ class FarkleGame():
     # sort combos by point value
     # combinations = {(key, combinations[key]) for key in sorted(
     #                 combinations, key=combinations.get, reverse=True)}
+    
     return combinations
     
   def calculate_dice_points(self, dice):
@@ -193,12 +194,28 @@ class HumanPlayer(Player):
 
 
 class ComputerPlayer(Player):
+    
+  def __init__(self, id):
+    super().__init__(id)
+    self.risk_threshold = 50
+    
   def select_dice(self, dice):
-    num_dice_to_select = random.randint(1, len(dice))
-    return random.sample(dice, num_dice_to_select)
+    combos = FarkleGame().get_dice_combinations(dice)
+    max_points = 0
+    max_combo = ()
+    for combo, points in combos.items():
+      if(points > max_points):
+        max_points = points
+        max_combo = combo
+    return max_combo
     
   def roll_again(self, current_round_points, num_remaining_dice):
-    return random.choice([True, False])
+    risk_metric = current_round_points/(num_remaining_dice**2)
+    print(self.risk_threshold)
+    if(risk_metric < self.risk_threshold):
+      return True
+    else:
+      return False
 
 class InvalidInputError(Exception):
   pass

@@ -1,30 +1,35 @@
 import farkle
+import sys, os, pprint
 
 class FarkleRunner():
   
   def __init__(self):
     self.farkle = farkle.FarkleGame()
+    self.farkle.add_player(farkle.HumanPlayer('ME!'))
+    self.farkle.add_player(farkle.ComputerPlayer('Comp 2'))
     self.current_round_points = 0
     self.MAX_DICE = 6
-    
+  
   def run_game(self):
     print('Welcome to Farkle!')
     game_over = False
+    round = 0
     while(not game_over):
+      round += 1
+      print('Round ' + str(round))
       current_player = self.farkle.get_current_player()
-      print('\nPlayer # ' + str(current_player.id))
+      print('\nPlayer: ' + str(current_player.id))
       self.play_turn(current_player)
       print('Total Points: ' + str(self.farkle.get_current_player().score))
       self.farkle.end_turn()
       if(self.farkle.has_winner()):
-        print('Congratulations, Player ' + str(self.farkle.get_winner().id) + ' wins!')
+        print('Congratulations, ' + str(self.farkle.get_winner().id) + ' wins!')
         game_over = True
+        
+    return round
   
   def play_turn(self, player):
     self.current_round_points = 0
-    # dice = self.farkle.roll_dice(self.MAX_DICE)
-    # turn_over = False
-    # while(not turn_over):
     points = self.run_dice_selection(self.MAX_DICE)
     print('round points:' + str(points))
     player.add_to_score(points)
@@ -57,10 +62,6 @@ class FarkleRunner():
           return self.run_dice_selection(num_remaining_dice)
         else:
           return self.current_round_points
-          # print('Next Players Turn')
-          #self.farkle.increment_player_turn()
-          # turn_over = True
-          #self.farkle.add_to_player_score(self.current_round_points)
         
       except farkle.InvalidInputError:
         print('Invalid input. Try again.')
