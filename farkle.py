@@ -41,7 +41,7 @@ class FarkleGame():
     return True
   
   def is_farkle(self, dice):
-    return len(self.get_dice_combinations(dice)) == 0
+    return len(self.get_max_dice_combination(dice)) == 0
     
   def has_winner(self):
     for player in self.players:
@@ -101,31 +101,29 @@ class FarkleGame():
     else:
       return False
     
-  def get_dice_combinations(self, dice):
-    combinations = {}
+  def get_max_dice_combination(self, dice):
     
     if(self.has_straight(dice)):
-      combinations[self.has_straight(dice)] = 3000
+      return self.get_remaining_dice_combinations(dice, self.has_straight(dice))
     if(self.has_three_pair(dice)):
-      combinations[self.has_three_pair(dice)] = 1500
+      return self.get_remaining_dice_combinations(dice, self.has_three_pair(dice))
     if(self.has_three_of_a_kind(dice)):
-      three_of_a_kind = self.has_three_of_a_kind(dice)
-      points = 0
-      if(three_of_a_kind[0] == 1):
-        points = 1000
-      else:
-        points = three_of_a_kind[0] * 100
-      combinations[three_of_a_kind] = points
+      return self.get_remaining_dice_combinations(dice, self.has_three_of_a_kind(dice))
     if(self.has_one(dice)):
-      combinations[self.has_one(dice)] = 100
+      return self.get_remaining_dice_combinations(dice, self.has_one(dice))
     if(self.has_five(dice)):
-      combinations[self.has_five(dice)] = 50
+      return self.get_remaining_dice_combinations(dice, self.has_five(dice))
       
-    # sort combos by point value
-    # combinations = {(key, combinations[key]) for key in sorted(
-    #                 combinations, key=combinations.get, reverse=True)}
+    return []
     
-    return combinations
+  def get_remaining_dice_combinations(self, all_dice, used_dice):
+    remaining_dice = self.remove_selected_dice(all_dice, used_dice)
+    remaining_combinations = self.get_max_dice_combination(remaining_dice)
+    if(len(remaining_combinations) > 0):
+      return used_dice + remaining_combinations
+    else:
+      return used_dice
+    
     
   def calculate_dice_points(self, dice):
     points = 0
@@ -178,7 +176,10 @@ class Player():
     self.score += points
     
   def select_dice(self, dice):
-    return (3,3,3)
+    pass
+  
+  def roll_again(self, current_round_points, num_remaining_dice):
+    pass
     
 
 class HumanPlayer(Player):
@@ -200,18 +201,10 @@ class ComputerPlayer(Player):
     self.risk_threshold = 50
     
   def select_dice(self, dice):
-    combos = FarkleGame().get_dice_combinations(dice)
-    max_points = 0
-    max_combo = ()
-    for combo, points in combos.items():
-      if(points > max_points):
-        max_points = points
-        max_combo = combo
-    return max_combo
+    return FarkleGame().get_max_dice_combination(dice)
     
   def roll_again(self, current_round_points, num_remaining_dice):
     risk_metric = current_round_points/(num_remaining_dice**2)
-    print(self.risk_threshold)
     if(risk_metric < self.risk_threshold):
       return True
     else:

@@ -5,9 +5,11 @@ class FarkleRunner():
   
   def __init__(self):
     self.farkle = farkle.FarkleGame()
-    self.farkle.add_player(farkle.HumanPlayer('ME!'))
-    self.farkle.add_player(farkle.ComputerPlayer('Comp 2'))
-    self.current_round_points = 0
+    # self.farkle.add_player(farkle.HumanPlayer('Marcus'))
+    # self.farkle.add_player(farkle.HumanPlayer('Kyle'))
+    self.farkle.add_player(farkle.ComputerPlayer('Computer 1'))
+    self.farkle.add_player(farkle.ComputerPlayer('Computer 2'))
+    # self.farkle.add_player(farkle.ComputerPlayer('Computer 3'))
     self.MAX_DICE = 6
   
   def run_game(self):
@@ -16,9 +18,10 @@ class FarkleRunner():
     round = 0
     while(not game_over):
       round += 1
-      print('Round ' + str(round))
+      print('\n---Round ' + str(round) + '---')
       current_player = self.farkle.get_current_player()
-      print('\nPlayer: ' + str(current_player.id))
+      print('Player: ' + str(current_player.id))
+      print('Total Points: ' + str(self.farkle.get_current_player().score))
       self.play_turn(current_player)
       print('Total Points: ' + str(self.farkle.get_current_player().score))
       self.farkle.end_turn()
@@ -26,15 +29,12 @@ class FarkleRunner():
         print('Congratulations, ' + str(self.farkle.get_winner().id) + ' wins!')
         game_over = True
         
-    return round
-  
   def play_turn(self, player):
-    self.current_round_points = 0
-    points = self.run_dice_selection(self.MAX_DICE)
-    print('round points:' + str(points))
+    points = self.run_dice_selection(0, self.MAX_DICE)
+    print('Round points:' + str(points))
     player.add_to_score(points)
   
-  def run_dice_selection(self, num_dice_to_roll):
+  def run_dice_selection(self, current_round_points, num_dice_to_roll):
     dice = self.farkle.roll_dice(num_dice_to_roll)
     while(True):
       try:
@@ -48,20 +48,19 @@ class FarkleRunner():
         print('Selected dice: ' + str(selected_dice))
         if(not self.farkle.selection_valid(selected_dice, dice)):
           raise farkle.InvalidSelectionError
-        self.current_round_points += self.farkle.calculate_dice_points(selected_dice)
-        print('Roll points: ' + str(self.current_round_points))
+        current_round_points += self.farkle.calculate_dice_points(selected_dice)
+        print('Roll points: ' + str(current_round_points))
         num_remaining_dice = len(dice) - len(selected_dice)
         if(num_remaining_dice == 0):
           num_remaining_dice = self.MAX_DICE
         print('Number of dice remaining: ' + str(num_remaining_dice))
         print('Roll again? (y/n)')
         roll_again = self.farkle.get_current_player() \
-          .roll_again(self.current_round_points, num_remaining_dice)
+          .roll_again(current_round_points, num_remaining_dice)
         if(roll_again):
-          # turn_over = False
-          return self.run_dice_selection(num_remaining_dice)
+          return self.run_dice_selection(current_round_points, num_remaining_dice)
         else:
-          return self.current_round_points
+          return current_round_points
         
       except farkle.InvalidInputError:
         print('Invalid input. Try again.')

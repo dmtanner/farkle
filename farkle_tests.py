@@ -4,6 +4,7 @@ import farkle
 class TestFarkle(unittest.TestCase):
   def setUp(self):
     self.farkle = farkle.FarkleGame()
+    self.farkle.add_player(farkle.HumanPlayer('Human Player'))
     
   def test_roll(self):
     dice = self.farkle.roll_dice(6)
@@ -87,38 +88,34 @@ class TestFarkle(unittest.TestCase):
     dice = (1,2,3,4,6,6)
     self.assertFalse(self.farkle.has_five(dice))
     
-  def test_dice_combinations(self):
+  def test_max_dice_combination(self):
     dice = (1,5)
-    combinations = self.farkle.get_dice_combinations(dice)
-    self.assertTrue((1,) in combinations.keys())
-    self.assertEqual(combinations[(1,)], 100)
-    self.assertTrue((5,) in combinations.keys())
-    self.assertEqual(combinations[(5,)], 50)
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,5)).issubset(combination))
     
     dice = (1,1,3,3,5,5)
-    combinations = self.farkle.get_dice_combinations(dice)
-    self.assertTrue((1,1,3,3,5,5) in combinations.keys())
-    self.assertEqual(combinations[(1,1,3,3,5,5)], 1500)
-    self.assertTrue((1,) in combinations.keys())
-    self.assertTrue((5,) in combinations.keys())
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,1,3,3,5,5)).issubset(combination))
     
     dice = (1,1,1,2,3,4)
-    combinations = self.farkle.get_dice_combinations(dice)
-    self.assertTrue((1,1,1) in combinations.keys())
-    self.assertEqual(combinations[(1,1,1)], 1000)
-    self.assertTrue((1,) in combinations.keys())
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,1,1)).issubset(combination))
     
     dice = (3,3,3,4,5,6)
-    combinations = self.farkle.get_dice_combinations(dice)
-    self.assertTrue((3,3,3) in combinations.keys())
-    self.assertEqual(combinations[(3,3,3)], 300)
-    self.assertTrue((5,) in combinations.keys())
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((3,3,3,5)).issubset(combination))
     
     dice = (1,2,3,4,5,6)
-    combinations = self.farkle.get_dice_combinations(dice)
-    self.assertTrue((1,2,3,4,5,6) in combinations.keys())
-    self.assertTrue((1,) in combinations.keys())
-    self.assertTrue((5,) in combinations.keys())
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,2,3,4,5,6)).issubset(combination))
+    
+    dice = (1,1,1,3,3,3)
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,1,1,3,3,3)).issubset(combination))
+    
+    dice = (1,1,3,3,3,5)
+    combination = self.farkle.get_max_dice_combination(dice)
+    self.assertTrue(set((1,1,3,3,3,5)).issubset(combination))
   
   def test_points_calculation(self):
     dice = (1,2,3,4,5,6)
@@ -155,7 +152,6 @@ class TestFarkle(unittest.TestCase):
     
   def test_dice_removal(self):
     dice = (1,1,1,3,4,4)
-    combinations = self.farkle.get_dice_combinations(dice)
     selected_dice = (1,1,1)
     remaining_dice = self.farkle.remove_selected_dice(dice, selected_dice)
     self.assertEqual((3,4,4), remaining_dice)
