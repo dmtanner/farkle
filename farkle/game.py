@@ -1,14 +1,22 @@
 import random
 from farkle.utilities import DiceCalculator
+from farkle.players import *
 
 class FarkleGame():
   def __init__(self):
     self.players = []
     self.current_player_turn = 0
+    self.round = 1
     self.WINNING_SCORE = 10000
     
   def add_player(self, player):
     self.players.append(player)
+    
+  def add_computer_player(self, id):
+    self.add_player(ComputerPlayer(id))
+    
+  def add_human_player(self, id):
+    self.add_player(HumanPlayer(id))
     
   def get_current_player(self):
     return self.players[self.current_player_turn]
@@ -17,6 +25,7 @@ class FarkleGame():
     self.current_player_turn += 1
     if(self.current_player_turn >= len(self.players)):
       self.current_player_turn = 0
+      self.round += 1
     
   def roll_dice(self, num_dice):
     dice = []
@@ -30,6 +39,12 @@ class FarkleGame():
     
   def get_player_score(self, player_id):
     return self.players[player_id].score
+  
+  def get_selected_dice(self, dice):
+    return self.get_current_player().select_dice(dice)
+  
+  def get_roll_again(self, current_round_points, num_remaining_dice):
+    return self.get_current_player().roll_again(current_round_points, num_remaining_dice)
     
   def selection_valid(self, selected_dice, all_dice):
     for die in selected_dice:

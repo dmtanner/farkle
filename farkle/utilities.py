@@ -1,5 +1,5 @@
 from collections import Counter
-import farkle.farkle_exceptions
+import farkle.farkle_exceptions as farkle_exceptions
 
 class DiceCalculator():
   @staticmethod
@@ -109,7 +109,7 @@ class DiceCalculator():
       points += 50
       dice = DiceCalculator.remove_selected_dice(dice, DiceCalculator.has_five(dice))
     else:
-      raise farkle.farkle_exceptions.InvalidSelectionError
+      raise farkle_exceptions.InvalidSelectionError
       
     if(len(dice) == 0):
       return points

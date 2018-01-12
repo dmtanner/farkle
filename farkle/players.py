@@ -1,4 +1,5 @@
 from farkle.utilities import DiceCalculator
+import farkle.farkle_exceptions as farkle_exceptions
 
 class Player():
   def __init__(self, id):
@@ -7,7 +8,7 @@ class Player():
     
   def add_to_score(self, points):
     self.score += points
-    
+      
   def select_dice(self, dice):
     pass
   
@@ -17,7 +18,30 @@ class Player():
 
 class HumanPlayer(Player):
   def select_dice(self, dice):
-    return input()
+    return self.to_tuple(input())
+    
+  def to_tuple(self, selection):
+    if(not self.input_valid(selection)):
+      raise farkle_exceptions.InvalidInputError
+    selected_dice = []
+    for char in selection:
+      selected_dice.append(int(char))
+    return tuple(selected_dice)
+    
+  def input_valid(self, selection):
+    if (len(selection) == 0):
+      return False
+    for char in selection:
+      if(not self.is_int(char)):
+        return False
+    return True
+    
+  def is_int(self, char):
+    try:
+      int(char)
+      return True
+    except ValueError:
+      return False
     
   def roll_again(self, current_round_points, num_remaining_dice):
     choice = input()
